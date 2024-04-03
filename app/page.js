@@ -20,25 +20,16 @@ export default function Home() {
           "X-Naver-Client-Secret": SECRET_KEY,
         },
       });
-      // resp.json(response.data.items);
       setData(response.data);
-      // console.log(response);
     } catch (e) {
       console.error(`e : ${e}`);
-      // resp.status(500).send("Internal Server Error");
     }
   };
 
   return (
     <div>
       <button onClick={onClick}>불러오기</button>
-      {data && (
-        <textarea
-          rows={7}
-          value={JSON.stringify(data, null, 2)}
-          readOnly={true}
-        />
-      )}
+      {JSON.stringify(data, null, 2)}
     </div>
   );
 }
