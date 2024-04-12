@@ -71,7 +71,10 @@ export default function Home() {
       <div className="h-[80px]"></div>
       {JSON.stringify(data, null, 2)}
 
-      <nav className="news-list-box">
+      <section className="section-wrap min-h-[500px]">
+        <div className="container mx-auto">
+          <div className="news-box border border-2"></div>
+        </div>
         <ul>
           {data.map((item, index) => (
             <li key={index}>
@@ -82,7 +85,7 @@ export default function Home() {
             </li>
           ))}
         </ul>
-      </nav>
+      </section>
     </div>
   );
 }
