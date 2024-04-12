@@ -45,6 +45,7 @@ export default function Home() {
 
   const [data, setData] = useState([]);
   const [searchData, setSerchData] = useState("");
+  const [isSearched, setIsSearched] = useState(false);
 
   const onClick = async () => {
     try {
@@ -65,6 +66,8 @@ export default function Home() {
     } catch (e) {
       console.error(`e : ${e}`);
     }
+
+    setIsSearched(true);
   };
 
   const onKeyDown = (e) => {
@@ -75,7 +78,7 @@ export default function Home() {
     <div className="site-wrap flex flex-col min-h-screen">
       <header className="top-bar navbar shadow-md fixed inset-x-0 bg-white">
         <a href="/" className="logo btn btn-ghost text-xl">
-          방구석코딩 뉴스
+          코딩 어려웠썬?
         </a>
         <div className="flex gap-x-3 ml-auto">
           <input
@@ -92,28 +95,27 @@ export default function Home() {
         </div>
       </header>
       <div className="h-[80px]"></div>
-      {/* {JSON.stringify(data, null, 2)} */}
 
       <section className="section-wrap flex-grow">
         <div className="container mx-auto h-full">
           <nav className="news-box">
-            <ul className="border border-2">
+            <ul className={`${isSearched ? "border-2" : "border-none"}`}>
               {data.map((item, index) => (
                 <li
                   key={index}
-                  className="border-b border-2 my-[10px] flex flex-col"
+                  className="border-b-2 my-[10px] flex flex-col p-3"
                 >
                   <a
                     href={item.originallink}
                     target="_blank"
-                    className="font-bold hover:underline my-3"
+                    className="news-tit font-bold hover:underline my-3"
                   >
-                    뉴스제목 : {item.title}
+                    {item.title}
                   </a>
-                  <a href={item.link} className="hover:underline">
+                  <a href={item.link} className="news-content hover:underline">
                     <span>{item.description}</span>
                   </a>
-                  <div className="flex justify-end mr-2">
+                  <div className="flex justify-end mr-2 mt-2">
                     <span>{formatDate(item.pubDate)}</span>
                   </div>
                 </li>
