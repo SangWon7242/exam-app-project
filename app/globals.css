@@ -12,4 +12,5 @@
 
 html > body {
   font-family: "GmarketSansMedium";
+  text-underline-position: under;
 }
