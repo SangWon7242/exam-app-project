@@ -2,6 +2,25 @@
 import axios from "axios";
 import { useState } from "react";
 
+const removeTags = (data) => {
+  const cleanedData = data.items.map((item) => {
+    // 각 객체의 속성에 특수 문자가 포함되어 있다고 가정하여 제거
+    const cleanedItem = {};
+    for (const key in item) {
+      if (Object.hasOwnProperty.call(item, key)) {
+        const value = item[key];
+        // 정규 표현식을 사용하여 특수 문자 제거 (예: '<', '>', '&')
+        cleanedItem[key] = value
+          .replace(/<(\/)?([a-zA-Z]*)(\s[a-zA-Z]*=[^>]*)?(\s)*(\/)?>/gi, "")
+          .replace(/(&quot\;)/g, '"');
+      }
+    }
+    return cleanedItem;
+  });
+
+  return cleanedData;
+};
+
 export default function Home() {
   const ID_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const SECRET_KEY = process.env.NEXT_PUBLIC_API_SECRET_KEY;
@@ -22,36 +41,46 @@ export default function Home() {
           "X-Naver-Client-Secret": SECRET_KEY,
         },
       });
-      setData(response.data);
+      const respData = removeTags(response.data);
+      console.log(respData);
+      setData(respData);
     } catch (e) {
       console.error(`e : ${e}`);
     }
   };
 
   return (
-    <div>
-      <div className="flex gap-x-3">
-        <input
-          className="input input-bordered"
-          type="text"
-          placeholder="날씨를 검색해주세요."
-          value={searchData}
-          onChange={(e) => setSerchData(e.target.value)}
-        />
-        <button className="btn btn-primary" onClick={onClick}>
-          검색
-        </button>
-      </div>
+    <div className="site-wrap">
+      <header className="top-bar navbar shadow-md fixed inset-x-0 bg-white">
+        <a href="/" className="logo btn btn-ghost text-xl">
+          방구석코딩 뉴스
+        </a>
+        <div className="flex gap-x-3 ml-auto">
+          <input
+            className="input input-bordered"
+            type="text"
+            placeholder="뉴스 검색"
+            value={searchData}
+            onChange={(e) => setSerchData(e.target.value)}
+          />
+          <button className="btn btn-primary" onClick={onClick}>
+            검색
+          </button>
+        </div>
+      </header>
+      <div className="h-[80px]"></div>
       {JSON.stringify(data, null, 2)}
 
       <nav className="news-list-box">
         <ul>
-          {Array.isArray(data.items) &&
-            data.items.map((item) => (
-              <li>
-                <a href="{item.originallink}">뉴스제목 : {item.title}</a>
-              </li>
-            ))}
+          {data.map((item, index) => (
+            <li key={index}>
+              <a href={item.originallink} target="_blank">
+                뉴스제목 : {item.title}
+              </a>
+              <span>{item.description}</span>
+            </li>
+          ))}
         </ul>
       </nav>
     </div>
