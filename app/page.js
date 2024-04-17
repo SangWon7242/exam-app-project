@@ -12,7 +12,9 @@ const removeTags = (data) => {
         // 정규 표현식을 사용하여 특수 문자 제거 (예: '<', '>', '&')
         cleanedItem[key] = value
           .replace(/<(\/)?([a-zA-Z]*)(\s[a-zA-Z]*=[^>]*)?(\s)*(\/)?>/gi, "")
-          .replace(/(&quot\;)/g, '"');
+          .replace(/(&quot\;)/g, '"')
+          .replace(/&lt;/g, "<")
+          .replace(/&gt;/g, ">");
       }
     }
     return cleanedItem;
@@ -52,7 +54,8 @@ export default function Home() {
       const response = await axios.get("/v1/search/news.json", {
         params: {
           query: searchData,
-          display: 20,
+          sort: "sim",
+          display: 10,
         },
         headers: {
           "X-Requested-With": "XMLHttpRequest",
