@@ -55,7 +55,7 @@ export default function Home() {
         params: {
           query: searchData,
           sort: "sim",
-          display: 10,
+          display: 100,
         },
         headers: {
           "X-Requested-With": "XMLHttpRequest",
@@ -99,15 +99,16 @@ export default function Home() {
       </header>
       <div className="h-[80px]"></div>
 
-      <section className="section-wrap flex-grow">
+      <section className="section-wrap flex-grow mb-[20px]">
         <div className="container mx-auto h-full">
           <nav className="news-box">
-            <ul className={`${isSearched ? "border-2" : "border-none"}`}>
+            <ul
+              className={`${
+                isSearched ? "border-t-2 border-x-2" : "border-none"
+              }`}
+            >
               {data.map((item, index) => (
-                <li
-                  key={index}
-                  className="border-b-2 my-[10px] flex flex-col p-3"
-                >
+                <li key={index} className="border-b-2 flex flex-col p-3">
                   <a
                     href={item.originallink}
                     target="_blank"
@@ -119,7 +120,9 @@ export default function Home() {
                     <span>{item.description}</span>
                   </a>
                   <div className="flex justify-end mr-2 mt-2">
-                    <span>{formatDate(item.pubDate)}</span>
+                    <span className="badge badge-secondary badge-outline">
+                      {formatDate(item.pubDate)}
+                    </span>
                   </div>
                 </li>
               ))}
