@@ -24,6 +24,7 @@ const removeTags = (data) => {
 };
 
 function formatDate(dateString) {
+  /*
   const date = new Date(dateString); // 주어진 문자열을 Date 객체로 파싱
 
   const year = date.getFullYear(); // 연도 가져오기 (YYYY 형식)
@@ -39,17 +40,31 @@ function formatDate(dateString) {
 
   const formattedDate = `${year}-${month}-${day}, ${dayOfWeek}, ${hours}:${minutes}:${seconds}`;
   return formattedDate;
+  */
+  const date = new Date(dateString);
+  const formattedDate = `${date.getFullYear()}-${String(
+    date.getMonth() + 1
+  ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}, ${
+    ["일", "월", "화", "수", "목", "금", "토"][date.getDay()]
+  }, ${String(date.getHours()).padStart(2, "0")}:${String(
+    date.getMinutes()
+  ).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+  return formattedDate;
 }
 
 export default function Home() {
   const ID_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const SECRET_KEY = process.env.NEXT_PUBLIC_API_SECRET_KEY;
 
+  const [allData, setAllData] = useState([]);
   const [data, setData] = useState([]);
   const [searchData, setSerchData] = useState("");
   const [isSearched, setIsSearched] = useState(false);
+  const [visiblePosts, setVisiblePosts] = useState(10);
 
-  const onClick = async () => {
+  // useEffect(() => {});
+
+  const fetchData = async () => {
     try {
       const response = await axios.get("/v1/search/news.json", {
         params: {
@@ -63,18 +78,30 @@ export default function Home() {
           "X-Naver-Client-Secret": SECRET_KEY,
         },
       });
-      const respData = removeTags(response.data);
-      console.log(respData);
-      setData(respData);
-    } catch (e) {
-      console.error(`e : ${e}`);
-    }
 
+      const cleanedData = removeTags(response.data);
+      setAllData(cleanedData);
+      return cleanedData.slice(0, 10);
+    } catch (error) {
+      console.error(`Error fetching data: ${error}`);
+      return [];
+    }
+  };
+
+  const onClick = async () => {
     setIsSearched(true);
+    const newData = await fetchData();
+    setData(newData);
   };
 
   const onKeyDown = (e) => {
     if (e.keyCode == 13) onClick();
+  };
+
+  const loadMorePosts = () => {
+    const newVisiblePosts = visiblePosts + 10;
+    setData(allData.slice(0, newVisiblePosts));
+    setVisiblePosts(newVisiblePosts);
   };
 
   return (
@@ -116,7 +143,11 @@ export default function Home() {
                   >
                     {item.title}
                   </a>
-                  <a href={item.link} className="news-content hover:underline">
+                  <a
+                    href={item.link}
+                    target="_blank"
+                    className="news-content hover:underline"
+                  >
                     <span>{item.description}</span>
                   </a>
                   <div className="flex justify-end mr-2 mt-2">
@@ -127,6 +158,14 @@ export default function Home() {
                 </li>
               ))}
             </ul>
+            {visiblePosts < allData.length && (
+              <button
+                className="border-2 h-[50px] w-full flex items-center justify-center mt-[10px] btn btn-accent"
+                onClick={loadMorePosts}
+              >
+                <span>게시물 더 보기</span>
+              </button>
+            )}
           </nav>
         </div>
       </section>
