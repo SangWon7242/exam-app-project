@@ -1,5 +1,6 @@
 "use client";
 import axios from "axios";
+import { stringify } from "postcss";
 import * as React from "react";
 
 const removeTags = (data) => {
@@ -61,16 +62,16 @@ export default function Home() {
     { id: 9, region: "경기도", nx: 60, ny: 120 },
   ]);
 
-  const [selectedRegion, setSelectedRegion] = React.useState(null);
+  const [selectedRegion, setSelectedRegion] = React.useState(regions[0].id);
 
   const weatherFetchData = async (nx, ny) => {
     try {
       const response = await fetch(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=20240418&base_time=0600&nx=${nx}&ny=${ny}`
       );
-      const json = await response.json();
-      console.log(json);
-      setWeatherData(json);
+      const data = await response.data;
+      console.log(data);
+      setWeatherData(data);
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
       return [];
@@ -152,21 +153,48 @@ export default function Home() {
 
       <section className="weather-section-wrap">
         <div className="container mx-auto h-full">
-          <div className="search-box">
+          <div className="weather-search-box">
             <select
               className="select select-primary w-full max-w-xs"
               onChange={handleSelectChange}
               value={selectedRegion?.id || ""}
             >
-              <option disabled selected>
-                지역을 선택하세요.
-              </option>
+              <option disabled>지역을 선택하세요.</option>
               {regions.map((region) => (
                 <option key={region.id} value={region.id}>
                   {region.region}
                 </option>
               ))}
             </select>
+          </div>
+          <div className="weather-main-box">
+            <div className="overflow-x-auto">
+              {console.log(`weatherData : ${JSON.stringify(weatherData)}`)}
+              <table className="table">
+                {/*
+                 */}
+                <thead>
+                  <tr>
+                    <th>기온</th>
+                    <th>강수량</th>
+                    <th>동서바람성분</th>
+                    <th>습도</th>
+                    <th>강수형태</th>
+                    <th>풍향</th>
+                    <th>풍속</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <th>시각</th>
+                    {weatherData &&
+                      weatherData.map((item, index) => (
+                        <td key={index}>{item.baseTime}</td>
+                      ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </section>
