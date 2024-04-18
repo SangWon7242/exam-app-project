@@ -1,6 +1,6 @@
 "use client";
 import axios from "axios";
-import { useState } from "react";
+import * as React from "react";
 
 const removeTags = (data) => {
   const cleanedData = data.items.map((item) => {
@@ -24,23 +24,6 @@ const removeTags = (data) => {
 };
 
 function formatDate(dateString) {
-  /*
-  const date = new Date(dateString); // 주어진 문자열을 Date 객체로 파싱
-
-  const year = date.getFullYear(); // 연도 가져오기 (YYYY 형식)
-  const month = String(date.getMonth() + 1).padStart(2, "0"); // 월 가져오기 (MM 형식, 0부터 시작하므로 1을 더하고 2자리로 만듦)
-  const day = String(date.getDate()).padStart(2, "0"); // 일 가져오기 (DD 형식)
-
-  const days = ["일", "월", "화", "수", "목", "금", "토"];
-  const dayOfWeek = days[date.getDay()]; // 요일 가져오기
-
-  const hours = String(date.getHours()).padStart(2, "0"); // 시 가져오기 (HH 형식)
-  const minutes = String(date.getMinutes()).padStart(2, "0"); // 분 가져오기 (MM 형식)
-  const seconds = String(date.getSeconds()).padStart(2, "0"); // 초 가져오기 (SS 형식)
-
-  const formattedDate = `${year}-${month}-${day}, ${dayOfWeek}, ${hours}:${minutes}:${seconds}`;
-  return formattedDate;
-  */
   const date = new Date(dateString);
   const formattedDate = `${date.getFullYear()}-${String(
     date.getMonth() + 1
@@ -48,7 +31,7 @@ function formatDate(dateString) {
     ["일", "월", "화", "수", "목", "금", "토"][date.getDay()]
   }, ${String(date.getHours()).padStart(2, "0")}:${String(
     date.getMinutes()
-  ).padStart(2, "0")}:${String(date.getSeconds()).padStart(2, "0")}`;
+  ).padStart(2, "0")}`;
   return formattedDate;
 }
 
@@ -56,13 +39,52 @@ export default function Home() {
   const ID_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const SECRET_KEY = process.env.NEXT_PUBLIC_API_SECRET_KEY;
 
-  const [allData, setAllData] = useState([]);
-  const [data, setData] = useState([]);
-  const [searchData, setSerchData] = useState("");
-  const [isSearched, setIsSearched] = useState(false);
-  const [visiblePosts, setVisiblePosts] = useState(10);
+  // 뉴스 담당 변수
+  const [allData, setAllData] = React.useState([]);
+  const [data, setData] = React.useState([]);
+  const [searchData, setSerchData] = React.useState("");
+  const [isSearched, setIsSearched] = React.useState(false);
+  const [visiblePosts, setVisiblePosts] = React.useState(10);
 
-  // useEffect(() => {});
+  // 날씨 데이터
+  const API_KEY = process.env.NEXT_PUBLIC_API_WEATHER_KEY;
+  const [weatherData, setWeatherData] = React.useState([]);
+  const [regions, setRegions] = React.useState([
+    { id: 1, region: "서울특별시", nx: 60, ny: 127 },
+    { id: 2, region: "부산광역시", nx: 98, ny: 76 },
+    { id: 3, region: "대구광역시", nx: 89, ny: 90 },
+    { id: 4, region: "인천광역시", nx: 55, ny: 124 },
+    { id: 5, region: "광주광역시", nx: 58, ny: 74 },
+    { id: 6, region: "대전광역시", nx: 67, ny: 100 },
+    { id: 7, region: "울산광역시", nx: 102, ny: 84 },
+    { id: 8, region: "세종특별자치시", nx: 66, ny: 103 },
+    { id: 9, region: "경기도", nx: 60, ny: 120 },
+  ]);
+
+  const [selectedRegion, setSelectedRegion] = React.useState(null);
+
+  const weatherFetchData = async (nx, ny) => {
+    try {
+      const response = await fetch(
+        `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=20240418&base_time=0600&nx=${nx}&ny=${ny}`
+      );
+      const json = await response.json();
+      console.log(json);
+      setWeatherData(json);
+    } catch (error) {
+      console.error(`Error fetching data: ${error}`);
+      return [];
+    }
+  };
+
+  const handleSelectChange = (event) => {
+    const selectedId = parseInt(event.target.value, 10);
+    const foundRegion = regions.find((region) => region.id === selectedId);
+    setSelectedRegion(foundRegion);
+
+    // API 호출을 여기서 직접 트리거하거나, 필요한 상위 컴포넌트에 정보를 전달
+    weatherFetchData(foundRegion.nx, foundRegion.ny);
+  };
 
   const fetchData = async () => {
     try {
@@ -89,6 +111,8 @@ export default function Home() {
   };
 
   const onClick = async () => {
+    if (searchData.length == 0) return;
+
     setIsSearched(true);
     const newData = await fetchData();
     setData(newData);
@@ -125,6 +149,27 @@ export default function Home() {
         </div>
       </header>
       <div className="h-[80px]"></div>
+
+      <section className="weather-section-wrap">
+        <div className="container mx-auto h-full">
+          <div className="search-box">
+            <select
+              className="select select-primary w-full max-w-xs"
+              onChange={handleSelectChange}
+              value={selectedRegion?.id || ""}
+            >
+              <option disabled selected>
+                지역을 선택하세요.
+              </option>
+              {regions.map((region) => (
+                <option key={region.id} value={region.id}>
+                  {region.region}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </section>
 
       <section className="section-wrap flex-grow mb-[20px]">
         <div className="container mx-auto h-full">
