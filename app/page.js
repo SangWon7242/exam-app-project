@@ -1,7 +1,7 @@
 "use client";
 import axios from "axios";
-import { stringify } from "postcss";
 import * as React from "react";
+import styled from "styled-components";
 
 const removeTags = (data) => {
   const cleanedData = data.items.map((item) => {
@@ -36,6 +36,32 @@ function formatDate(dateString) {
   return formattedDate;
 }
 
+const SiteLogo = styled.img`
+  width: 150px;
+`;
+
+const MainBannerImgBox = styled.section`
+  min-height: 450px;
+  height: 400px;
+`;
+
+const BannerCon = styled.div`
+  margin: 0 auto;
+  background-image: url("/images/main_banner.jpg");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center;
+  position: relative;
+  height: 100%;
+`;
+
+const BannerLogo = styled.img`
+  position: absolute;
+  width: 350px;
+  top: 13%;
+  left: 20%;
+`;
+
 export default function Home() {
   const ID_KEY = process.env.NEXT_PUBLIC_API_KEY;
   const SECRET_KEY = process.env.NEXT_PUBLIC_API_SECRET_KEY;
@@ -69,9 +95,9 @@ export default function Home() {
       const response = await fetch(
         `https://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getUltraSrtNcst?serviceKey=${API_KEY}&pageNo=1&numOfRows=1000&dataType=JSON&base_date=20240418&base_time=0600&nx=${nx}&ny=${ny}`
       );
-      const data = await response.data;
-      console.log(data);
-      setWeatherData(data);
+      const data = await response.json();
+      console.log(`data : ${data}`);
+      setWeatherData(data.response.body.items.item);
     } catch (error) {
       console.error(`Error fetching data: ${error}`);
       return [];
@@ -132,8 +158,8 @@ export default function Home() {
   return (
     <div className="site-wrap flex flex-col min-h-screen">
       <header className="top-bar navbar shadow-md fixed inset-x-0 bg-white">
-        <a href="/" className="logo btn btn-ghost text-xl">
-          코딩 어려웠썬?
+        <a href="/" className="logo text-xl">
+          <SiteLogo src="/images/logo.jpg" />
         </a>
         <div className="flex gap-x-3 ml-auto">
           <input
@@ -149,9 +175,9 @@ export default function Home() {
           </button>
         </div>
       </header>
-      <div className="h-[80px]"></div>
+      <div className="h-[65px]"></div>
 
-      <section className="weather-section-wrap">
+      {/* <section className="weather-section-wrap">
         <div className="container mx-auto h-full">
           <div className="weather-search-box">
             <select
@@ -168,38 +194,33 @@ export default function Home() {
             </select>
           </div>
           <div className="weather-main-box">
-            <div className="overflow-x-auto">
-              {console.log(`weatherData : ${JSON.stringify(weatherData)}`)}
-              <table className="table">
-                {/*
-                 */}
-                <thead>
-                  <tr>
-                    <th>기온</th>
-                    <th>강수량</th>
-                    <th>동서바람성분</th>
-                    <th>습도</th>
-                    <th>강수형태</th>
-                    <th>풍향</th>
-                    <th>풍속</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <th>시각</th>
-                    {weatherData &&
-                      weatherData.map((item, index) => (
-                        <td key={index}>{item.baseTime}</td>
-                      ))}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            {console.log(`weatherData : ${JSON.stringify(weatherData)}`)}
+            <ul>
+              <li>시각</li>
+              <li>기온</li>
+              <li>강수량</li>
+              <li>풍속</li>
+              <li>습도</li>
+            </ul>
+
+            {weatherData.map((data, index) => (
+              <ul key={index}>
+                <li>{data.baseTime}</li>
+                <li>{data.category}</li>
+                <li></li>
+                <li></li>
+              </ul>
+            ))}
           </div>
         </div>
-      </section>
+      </section> */}
+      <MainBannerImgBox>
+        <BannerCon className="container">
+          <BannerLogo src="/images/banner_logo.png" />
+        </BannerCon>
+      </MainBannerImgBox>
 
-      <section className="section-wrap flex-grow mb-[20px]">
+      <section className="section-wrap flex-grow mb-[20px] mt-[10px]">
         <div className="container mx-auto h-full">
           <nav className="news-box">
             <ul
