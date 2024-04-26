@@ -1,7 +1,7 @@
 import "./globals.css";
 
 export const metadata = {
-  title: "웹 스크래핑 연습",
+  title: "웹 스크래핑",
   description: "웹 스크래핑 연습",
 };
 
