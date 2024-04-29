@@ -40,24 +40,21 @@ const SiteLogo = styled.img`
   width: 150px;
 `;
 
-const MainBannerImgBox = styled.section`
-  min-height: 450px;
-  height: 400px;
-`;
+const MainBannerImgBox = styled.section``;
 
 const BannerCon = styled.div`
   margin: 0 auto;
   background-image: url("/images/main_banner.jpg");
   background-repeat: no-repeat;
-  background-size: 100% 100%;
-  background-position: center;
+  background-size: 100% 120%;
+  background-position: center center;
   position: relative;
-  height: 100%;
+  height: 45vh;
 `;
 
 const BannerLogo = styled.img`
   position: absolute;
-  width: 350px;
+  width: 400px;
   top: 13%;
   left: 20%;
 `;
@@ -157,13 +154,13 @@ export default function Home() {
 
   return (
     <div className="site-wrap flex flex-col min-h-screen">
-      <header className="top-bar navbar shadow-md fixed inset-x-0 bg-white">
-        <a href="/" className="logo text-xl">
+      <header className="top-bar navbar shadow-md fixed inset-x-0 bg-white z-10">
+        <a href="/" className="logo">
           <SiteLogo src="/images/logo.jpg" />
         </a>
         <div className="flex gap-x-3 ml-auto">
           <input
-            className="input input-bordered"
+            className="input input-bordered "
             type="text"
             placeholder="뉴스 검색"
             value={searchData}
@@ -220,7 +217,7 @@ export default function Home() {
         </BannerCon>
       </MainBannerImgBox>
 
-      <section className="section-wrap flex-grow mb-[20px] mt-[10px]">
+      <section className="section-wrap flex-grow mb-[20px] mt-[10px] max-[768px]:px-[10px]">
         <div className="container mx-auto h-full">
           <nav className="news-box">
             <ul
